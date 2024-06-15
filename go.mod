@@ -2,7 +2,10 @@ module github.com/sebarcode/ostate
 
 go 1.22.4
 
-require github.com/smartystreets/goconvey v1.8.1
+require (
+	github.com/sebarcode/codekit v0.1.6
+	github.com/smartystreets/goconvey v1.8.1
+)
 
 require (
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
