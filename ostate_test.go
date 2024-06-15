@@ -19,6 +19,12 @@ func TestOstate(t *testing.T) {
 
 		sm := ostate.NewStateEngine(&ostate.StateEngineOpts{
 			RegulateFlow: true,
+			Flow: map[string][]string{
+				"Draft":     {"Submitted"},
+				"Submitted": {"Working", "Rejected"},
+				"Working":   {"Done", "Error"},
+				"Rejected":  {"Error"},
+			},
 		})
 
 		err := sm.Load(req)
@@ -28,6 +34,22 @@ func TestOstate(t *testing.T) {
 			err = sm.ChangeState(req, "Submitted", nil)
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(req.State(), convey.ShouldEqual, "Submitted")
+
+			convey.Convey("invalid state", func() {
+				err = sm.ChangeState(req, "Done", nil)
+				convey.So(err, convey.ShouldNotBeNil)
+				convey.Print("  ", req.State())
+
+				convey.Convey("change to working", func() {
+					err = sm.ChangeState(req, "Working", nil)
+					convey.So(err, convey.ShouldBeNil)
+
+					convey.Convey("change to done", func() {
+						err = sm.ChangeState(req, "Done", nil)
+						convey.So(err, convey.ShouldBeNil)
+					})
+				})
+			})
 		})
 	})
 }
